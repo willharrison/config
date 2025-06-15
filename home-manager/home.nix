@@ -6,7 +6,7 @@
 
   home.stateVersion = "25.05"; # Do not change when updating home manager
 
-  home.file = {};
+  home.file = { };
 
   home.packages = [
     pkgs.curl
@@ -85,5 +85,15 @@
     enable = true;
     userName = "Will Harrison";
     userEmail = "will@jwh.io";
+  };
+
+  programs.ssh = {
+    enable = true;
+    addKeysToAgent = "yes";
+    matchBlocks = {
+      "github.com" = {
+        identityFile = "~/.ssh/id_ed25519-will";
+      };
+    };
   };
 }
