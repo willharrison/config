@@ -1,0 +1,27 @@
+- name: Link .zshrc
+  ansible.builtin.file:
+    src: "{{ playbook_dir }}/.zshrc"
+    dest: "{{ ansible_env.HOME}}/.zshrc"
+    state: link
+    force: true
+
+- name: Install packages
+  apt:
+    name:
+      - zsh
+      - docker.io
+      - fzf
+      - curl
+    state: present
+    update_cache: true
+
+- name: Install mise
+  shell: curl https://mise.run | sh
+  args:
+    creates: ~/.local/bin/mise
+
+- name: Enable and start Docker
+  systemd:
+    name: docker
+    enabled: true
+    state: started
