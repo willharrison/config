@@ -92,7 +92,6 @@
     addKeysToAgent = "yes";
     extraConfig = ''
       Host *
-        UseKeychain yes
         AddKeysToAgent yes
     '';
     matchBlocks = {
