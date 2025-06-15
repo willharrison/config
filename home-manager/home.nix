@@ -18,7 +18,21 @@
     pkgs.scala
     pkgs.php
     pkgs.nmap
-  ];
+    pkgs.discord
+    pkgs.vscode
+    pkgs._1password-gui
+    pkgs._1password-cli
+    pkgs.doctl
+    pkgs.jetbrains.goland
+    pkgs.redisinsight
+  ] ++ (if pkgs.stdenv.isDarwin then [
+    pkgs.chatgpt
+    pkgs.google-chrome
+    pkgs.iterm2
+    pkgs.tableplus
+  ] else [
+    pkgs.chromium
+  ]);
 
   home.sessionVariables = {
     EDITOR = "nvim";
