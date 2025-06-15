@@ -9,6 +9,7 @@
   home.file = {};
 
   home.packages = [
+    pkgs.curl
     pkgs.rustup
     pkgs.ruby
     pkgs.python3
@@ -16,6 +17,7 @@
     pkgs.nodejs
     pkgs.scala
     pkgs.php
+    pkgs.nmap
   ];
 
   home.sessionVariables = {
