@@ -2,7 +2,12 @@
 
 {
   home.username = "will";
-  home.homeDirectory = "/home/will";
+  home.homeDirectory = 
+    if pkgs.stdenv.isDarwin 
+      then 
+        "/Users/will" 
+      else 
+        "/home/will";
 
   home.stateVersion = "25.05"; # Do not change when updating home manager
 
@@ -19,18 +24,19 @@
     pkgs.php
     pkgs.nmap
     pkgs.discord
-    pkgs.vscode
-    pkgs._1password-gui
-    pkgs._1password-cli
+    #pkgs.vscode
     pkgs.doctl
     pkgs.jetbrains.goland
-    pkgs.redisinsight
   ] ++ (if pkgs.stdenv.isDarwin then [
     pkgs.chatgpt
-    pkgs.google-chrome
     pkgs.iterm2
     pkgs.tableplus
+    pkgs.raycast
+    pkgs.notion-app
   ] else [
+    pkgs._1password-gui
+    pkgs._1password-cli
+    pkgs.redisinsight
     pkgs.chromium
   ]);
 
@@ -46,11 +52,11 @@
     history.size = 10000;
     oh-my-zsh = {
       enable = true;
-      theme = "robbyrussell";
+      theme = "gentoo";
     };
     shellAliases = {
       bs = "sudo /nix/var/nix/profiles/default/bin/nix run 'github:numtide/system-manager' -- switch --flake '~/.config/system-manager'";
-      bh = "home-manager switch";
+      bh = "home-manager switch --impure";
       es = "nvim ~/.config/system-manager/system.nix";
       eh = "nvim ~/.config/home-manager/home.nix";
       vi = "nvim";
@@ -106,12 +112,22 @@
     addKeysToAgent = "yes";
     extraConfig = ''
       Host *
-        AddKeysToAgent yes
+        IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
     '';
-    matchBlocks = {
-      "github.com" = {
-        identityFile = "~/.ssh/id_ed25519-will";
+  };
+
+  programs.vscode = {
+    enable = true;
+    profiles.default = {
+      userSettings = {
+        "editor.fontSize" = 16;
       };
+      extensions = with pkgs.vscode-extensions; [
+        bbenoist.nix
+        ms-azuretools.vscode-docker
+        golang.go
+        vscodevim.vim
+      ];
     };
   };
 }
