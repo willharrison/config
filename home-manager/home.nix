@@ -27,6 +27,8 @@
     #pkgs.vscode
     pkgs.doctl
     pkgs.jetbrains.goland
+    pkgs.windsurf
+    #pkgs.immersed
   ] ++ (if pkgs.stdenv.isDarwin then [
     pkgs.chatgpt
     pkgs.iterm2
