@@ -1,0 +1,111 @@
+- name: Install packages
+  apt:
+    name:
+      - docker.io
+    state: present
+    update_cache: true
+
+- name: Enable and start Docker
+  systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Ensure sshd_config has desired settings
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^{{ item.key }}"
+    line: "{{ item.key }} {{ item.value }}"
+    state: present
+    backup: yes
+  loop:
+    - { key: "PasswordAuthentication", value: "no" }
+    - { key: "PermitRootLogin", value: "no" }
+    - { key: "PubkeyAuthentication", value: "yes" }
+
+- name: Ensure authorized key for user "will"
+  ansible.posix.authorized_key:
+    user: will
+    state: present
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII8dxeqE/41P1c1BLiIT2dicu6KFbGihA4zWF2cNIioL will@jwh.io"
+
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: Ensure sda mount point
+  file:
+    path: /mnt/sda
+    state: directory
+    mode: '0755'
+
+- name: Mount sda
+  mount:
+    path: /mnt/sda
+    src: /dev/sda
+    fstype: ext3
+    state: mounted
+
+- name: persist sda mount
+  mount:
+    path: /mnt/sda
+    src: /dev/sda
+    fstype: ext3
+    state: present
+      
+- name: Install Netatalk and Avahi
+  apt:
+    name:
+      - netatalk
+      - avahi-daemon
+    state: present
+
+- name: Configure afp.conf
+  copy:
+    dest: /etc/netatalk/afp.conf
+    content: |
+      [TimeMachine]
+      path = /mnt/sda/timemachine/wills-macbook-pro
+      time machine = yes
+      valid users = will
+
+- name: set netatalk password
+  command: echo "{{ netatalk_password }}" | passwd --stdin will
+  when: netatalk_password is defined
+
+- name: Restart netatalk
+  service:
+    name: netatalk
+    state: restarted
+
+- name: Restart avahi
+  service:
+    name: avahi-daemon
+    state: restarted
+
+- name: ensure /mnt/sdb2 exists
+  file:
+    path: /mnt/sdb2
+    state: directory
+    mode: '0777'
+
+- name: install samba
+  apt:
+    name: samba
+    state: present
+
+- name: configure samba
+  blockinfile:
+    path: /etc/samba/smb.conf
+    block: |
+      [Backups]
+      path = /mnt/sdb2
+      browseable = yes
+      writable = yes
+      guest ok = yes
+
+- name: restart samba
+  service:
+    name: smbd
+    state: restarted

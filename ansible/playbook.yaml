@@ -1,0 +1,8 @@
+- hosts: localhost
+  connection: local
+  vars:
+    netatalk_password: timemachine
+  gather_facts: true
+  become: true
+  roles:
+    - linux
